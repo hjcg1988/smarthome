@@ -1,0 +1,24 @@
+# Secrets
+secrets.yaml
+*.env
+.env*
+
+# Home Assistant runtime
+.cloud/
+.storage/
+home-assistant.log
+home-assistant_v2.db
+*.db-journal
+tts/
+www/
+custom_components/
+blueprints/
+esphome/
+
+# Local backups
+*.bak
+*.bak.*
+
+# OS
+.DS_Store
+Thumbs.db

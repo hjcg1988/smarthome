@@ -1,0 +1,56 @@
+# Automations for Ring Doorbell with Snapshots
+
+- id: ring_motion_notification_yaml
+  alias: "Ring Motion Notification YAML"
+  description: "Send Telegram alert with snapshot when Ring detects motion or person"
+  trigger:
+    - platform: mqtt
+      topic: "ring/98b21b5e-8d1e-4240-a98a-d71e7ebac30d/camera/5c475e011b89/event_select/attributes"
+  condition:
+    - condition: template
+      value_template: >
+        {% set last = state_attr('input_datetime.ring_last_notification', 'timestamp') | default(0) | int %}
+        {% set now_ts = as_timestamp(now()) | default(0) | int %}
+        {{ last == 0 or (now_ts - last) > 180 }}
+  action:
+    - service: shell_command.ring_get_video_frame
+      data:
+        url: "{{ trigger.payload_json.recordingUrl }}"
+        path: "/config/snapshots/ring_motion.jpg"
+    - service: telegram_bot.send_photo
+      data:
+        target: 8514988238
+        file: "/config/snapshots/ring_motion.jpg"
+        caption: "🚪 **Ring Alert**\n\nMotion detected at Front Door!"
+    - service: input_datetime.set_datetime
+      target:
+        entity_id: input_datetime.ring_last_notification
+      data:
+        timestamp: "{{ as_timestamp(now()) }}"
+  mode: single
+
+- id: ring_ding_notification_yaml
+  alias: "Ring Doorbell Notification YAML"
+  description: "Send Telegram alert with snapshot when doorbell is pressed"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.front_door_ding
+      attribute: lastDing
+  condition:
+    - condition: template
+      value_template: "{{ trigger.from_state.attributes.lastDing != trigger.to_state.attributes.lastDing }}"
+  action:
+    - service: shell_command.ring_get_snapshot
+      data:
+        path: "/config/snapshots/ring_ding.jpg"
+    - service: telegram_bot.send_photo
+      data:
+        target: 8514988238
+        file: "/config/snapshots/ring_ding.jpg"
+        caption: "🔔 **Ring Doorbell**\n\nSomeone is at the front door!"
+    - service: input_datetime.set_datetime
+      target:
+        entity_id: input_datetime.ring_last_notification
+      data:
+        timestamp: "{{ as_timestamp(now()) }}"
+  mode: single

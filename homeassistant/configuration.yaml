@@ -1,0 +1,46 @@
+# Home Assistant Configuration for Humberto's Smart Home
+
+homeassistant:
+  name: Casa Humberto
+  time_zone: America/Los_Angeles
+  unit_system: imperial
+  temperature_unit: F
+  allowlist_external_dirs:
+    - /config/snapshots
+  packages: !include_dir_named packages
+
+# Logger
+logger:
+  default: warning
+  logs:
+    homeassistant.components.automation: debug
+    homeassistant.components.telegram_bot: debug
+    homeassistant.components.shell_command: debug
+
+# Input Boolean for Silence Mode
+input_boolean:
+  ring_silence:
+    name: "Ring Silence Mode"
+    icon: mdi:bell-off
+
+# Input to track last notification time (prevent spam)
+input_datetime:
+  ring_last_notification:
+    name: "Ring Last Notification"
+    has_date: true
+    has_time: true
+
+# Shell Commands
+shell_command:
+  ring_silence_60: "echo 'Ring silence activated for 60 minutes'"
+  ring_get_snapshot: "python3 /config/scripts/get_ring_snapshot.py {{ path }}"
+  ring_get_video_frame: "python3 /config/scripts/ring_video_frame.py '{{ url }}' '{{ path }}'"
+
+# Telegram Notifications
+notify:
+  - name: telegram
+    platform: telegram
+    chat_id: 8514988238
+
+# Automations
+automation: !include automations.yaml
