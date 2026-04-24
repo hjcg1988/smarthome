@@ -12,6 +12,11 @@
         {% set last = state_attr('input_datetime.ring_last_notification', 'timestamp') | default(0) | int %}
         {% set now_ts = as_timestamp(now()) | default(0) | int %}
         {{ last == 0 or (now_ts - last) > 180 }}
+    - condition: template
+      value_template: >
+        {% set current_id = trigger.payload_json.eventId | default('none') %}
+        {% set last_id = states('input_text.ring_last_event_id') | default('none') %}
+        {{ current_id != last_id and current_id != 'none' }}
   action:
     - service: shell_command.ring_get_video_frame
       data:
@@ -27,6 +32,11 @@
         entity_id: input_datetime.ring_last_notification
       data:
         timestamp: "{{ as_timestamp(now()) }}"
+    - service: input_text.set_value
+      target:
+        entity_id: input_text.ring_last_event_id
+      data:
+        value: "{{ trigger.payload_json.eventId }}"
   mode: single
 
 - id: ring_ding_notification_yaml

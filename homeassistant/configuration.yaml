@@ -30,6 +30,14 @@ input_datetime:
     has_date: true
     has_time: true
 
+# Input to track last motion eventId (prevent duplicate events)
+input_text:
+  ring_last_event_id:
+    name: "Ring Last Event ID"
+    min: 0
+    max: 255
+    initial: "none"
+
 # Shell Commands
 shell_command:
   ring_silence_60: "echo 'Ring silence activated for 60 minutes'"
