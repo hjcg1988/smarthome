@@ -6,6 +6,7 @@
 set -euo pipefail
 
 HA_DIR="$HOME/homeassistant"
+INFRA_DIR="$HOME/casa-inteligente"
 REPO_DIR="$HOME/smarthome-repo"
 BACKUP_DIR="$REPO_DIR/homeassistant"
 TIMESTAMP=$(date +"%Y-%m-%d %H:%M:%S")
@@ -18,7 +19,7 @@ if [ ! -d "$REPO_DIR/.git" ]; then
     exit 1
 fi
 
-# Copy config files (excluding sensitive/cache dirs)
+# 1. Copy Home Assistant config
 rsync -av --delete \
     --exclude='.cloud/' \
     --exclude='.cache/' \
@@ -31,6 +32,15 @@ rsync -av --delete \
     --exclude='__pycache__/' \
     --exclude='.git/' \
     "$HA_DIR/" "$BACKUP_DIR/"
+
+# 2. Copy Mosquitto config
+mkdir -p "$REPO_DIR/infrastructure/mosquitto/config"
+rsync -av --delete "$INFRA_DIR/mosquitto/config/" "$REPO_DIR/infrastructure/mosquitto/config/"
+
+# 3. Copy Ring-MQTT config
+mkdir -p "$REPO_DIR/infrastructure/ring-mqtt"
+cp -f "$INFRA_DIR/ring-mqtt/config.json" "$REPO_DIR/infrastructure/ring-mqtt/" 2>/dev/null || true
+cp -f "$INFRA_DIR/ring-mqtt/ring-state.json" "$REPO_DIR/infrastructure/ring-mqtt/" 2>/dev/null || true
 
 # Add timestamp note
 echo "# Last backup: $TIMESTAMP" > "$BACKUP_DIR/.backup-timestamp"
