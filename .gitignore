@@ -22,3 +22,4 @@ esphome/
 # OS
 .DS_Store
 Thumbs.db
+secrets.yaml
