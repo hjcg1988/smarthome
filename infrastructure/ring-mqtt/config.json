@@ -1,0 +1,17 @@
+{
+  "ring_token": "",
+  "mqtt_host": "192.168.1.131",
+  "mqtt_port": 1883,
+  "mqtt_user": "",
+  "mqtt_pass": "",
+  "livestream_user": "ring-mqtt",
+  "livestream_pass": "ring-mqtt",
+  "disarm_code": "",
+  "enable_cameras": true,
+  "enable_modes": false,
+  "enable_panic": false,
+  "hass_topic": "homeassistant/status",
+  "ring_topic": "ring",
+  "mqtt_options": "",
+  "location_ids": ""
+}
