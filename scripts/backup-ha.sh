@@ -31,8 +31,6 @@ rsync -av --delete \
     --exclude='custom_components/' \
     --exclude='__pycache__/' \
     --exclude='.git/' \
-    --exclude='secrets.yaml' \
-    --exclude='home-assistant_v2.db*' \
     "$HA_DIR/" "$BACKUP_DIR/"
 
 # Add timestamp note
