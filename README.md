@@ -55,7 +55,8 @@ Ring detecta motion
       → ffmpeg extrae el primer frame del video parcial
       → Guarda en /config/snapshots/ring_motion.jpg
   → telegram_bot.send_photo envía la imagen al chat
-  → input_datetime.ring_last_notification se actualiza (cooldown: 180s)
+  → input_datetime.ring_last_motion se actualiza (cooldown: 60s)
+  → input_text.ring_last_event_id se actualiza (deduplicación por eventId)
 ```
 
 **Ventaja:** La imagen es el **primer frame exacto del video del evento**, no un snapshot tomado después.
@@ -75,7 +76,7 @@ Alguien presiona el timbre
       → Recibe imagen del topic snapshot/image
       → Guarda en /config/snapshots/ring_ding.jpg
   → telegram_bot.send_photo envía la imagen
-  → input_datetime.ring_last_notification se actualiza
+  → input_datetime.ring_last_ding se actualiza (cooldown: 180s)
 ```
 
 **Nota:** El ding actualmente usa snapshot **on-demand** en lugar de esperar el snapshot específico del evento (`type: "ding"`). Esto puede causar que la imagen no corresponda exactamente al momento del timbre. Ver [Pendientes](#-pendientes).
@@ -86,75 +87,86 @@ Alguien presiona el timbre
 
 ```
 .
-├── .gitignore              # Excluye secrets, DBs, runtime files
+├── .gitignore              # Excluye runtime files, backups locales
 ├── README.md               # Este archivo
+├── PLAN.md                 # Plan maestro del proyecto
 ├── homeassistant/
 │   ├── configuration.yaml    # Config principal de HA
 │   ├── automations.yaml      # Automatizaciones Ring
+│   ├── secrets.yaml          # Tokens y credenciales (repo privado)
+│   ├── home-assistant_v2.db  # Base de datos completa de HA
+│   ├── .storage/             # Estado de integraciones y auth
 │   ├── packages/
-│   │   ″ ring.yaml           # Package de Ring (actualmente vacío)
-│   ″ scripts/
+│   │   └── ring.yaml         # Package de Ring
+│   └── scripts/
 │       ├── get_ring_snapshot.py    # Snapshot on-demand vía MQTT
-│       ″ ring_video_frame.py     # Descarga video + extrae frame
-″ docs/
-    ″ SETUP_RING_TELEGRAM.md   # Documentación detallada
+│       └── ring_video_frame.py     # Descarga video + extrae frame
+└── docs/
+    └── SETUP_RING_TELEGRAM.md   # Documentación detallada
 ```
 
 ---
 
-## 🛠️ Requisitos para Restaurar
+## 🛠️ Disaster Recovery (Restaurar desde cero)
 
-### 1. Docker + Docker Compose
+Este repo contiene **todo lo necesario** para reconstruir HA en caso de pérdida total. Incluye `secrets.yaml`, `.storage/`, y `home-assistant_v2.db`.
+
+### Restauración rápida (1 comando)
+
+```bash
+# 1. Clonar el repo
+git clone https://github.com/hjcg1988/smarthome.git
+cd smarthome
+
+# 2. Copiar TODO al contenedor de HA
+docker cp homeassistant/. homeassistant:/config/
+
+# 3. Reiniciar
+docker restart homeassistant
+```
+
+Listo. HA arranca exactamente como estaba — tokens, configuraciones, dispositivos registrados, historial, todo.
+
+---
+
+### Restauración manual (si no tienes el repo clonado)
+
+#### 1. Docker + Docker Compose
 
 Los contenedores se gestionan con Docker. Verificar que estén en la red `casa-inteligente`.
 
-### 2. Archivos que NO están en este repo (manuales)
-
-| Archivo | Ubicación en host | Cómo obtener |
-|---|---|---|
-| `secrets.yaml` | `~/homeassistant/secrets.yaml` | Contiene tokens de Ring, MQTT, Telegram. **NUNCA subir a git.** Reconstruir manualmente desde backup seguro. |
-| Token de ring-mqtt | Variable `RINGMQTT_TOKEN` o config.json | Obtener de `https://github.com/tsightler/ring-mqtt` (autenticación Ring). |
-| Token de Telegram Bot | `secrets.yaml` → `telegram_bot` | Obtener de [@BotFather](https://t.me/BotFather). |
-
-### 3. Crear directorios en el contenedor de HA
+#### 2. Crear directorios en el contenedor de HA
 
 ```bash
-docker exec homeassistant mkdir -p /config/snapshots /config/scripts
+docker exec homeassistant mkdir -p /config/snapshots /config/scripts /config/packages
 ```
 
-### 4. Copiar archivos
+#### 3. Copiar archivos del repo
 
 ```bash
-cp configuration.yaml automations.yaml ~/homeassistant/
-cp scripts/*.py ~/homeassistant/scripts/
-chmod +x ~/homeassistant/scripts/*.py
-docker cp ~/homeassistant/scripts/*.py homeassistant:/config/scripts/
+cp -r homeassistant/* ~/homeassistant/
+docker cp ~/homeassistant/. homeassistant:/config/
 ```
 
-### 5. Configurar `secrets.yaml`
-
-Ejemplo de estructura mínima:
-
-```yaml
-# ~/homeassistant/secrets.yaml
-telegram_bot_api_key: "YOUR_BOT_TOKEN"
-```
-
-Y en `configuration.yaml` referenciarlo si es necesario (actualmente el chat_id está hardcodeado en config).
-
-### 6. Reiniciar Home Assistant
+#### 4. Reiniciar Home Assistant
 
 ```bash
 docker restart homeassistant
 ```
 
-### 7. Verificar ring-mqtt
+#### 5. Verificar ring-mqtt
 
 ```bash
 docker logs ring-mqtt --follow
 ```
 
 Debe mostrar "Connected to MQTT broker" y descubrir la cámara.
+
+---
+
+### ⚠️ Nota de seguridad
+
+Este repo es **privado** y contiene tokens (`secrets.yaml`) + datos de auth (`.storage/`). Mantén 2FA activado en GitHub. Si el repo se ve comprometido, rota tokens inmediatamente.
 
 ---
 
@@ -212,12 +224,13 @@ docker exec homeassistant ls -la /tmp/test.mp4
 
 ## 📝 Pendientes
 
-| # | Tarea | Prioridad |
+| # | Tarea | Estado |
 |---|---|---|
-| 1 | **Fix ding:** Esperar snapshot `type: "ding"` en lugar de on-demand | Alta |
-| 2 | **Separar cooldowns:** Crear `ring_last_ding` y `ring_last_motion` como entidades independientes | Media |
-| 3 | **Test delay real:** Medir tiempo end-to-end con evento en vivo | Media |
-| 4 | **Range requests:** Si Ring algún día soporta HTTP Range, optimizar a descarga de ~200KB | Baja |
+| 1 | **Fix ding:** Esperar snapshot `type: "ding"` en lugar de on-demand | Pendiente |
+| 2 | **Cooldowns separados:** `ring_last_motion` (60s) y `ring_last_ding` (180s) | ✅ Hecho |
+| 3 | **Backup automático:** Script diario a las 3am + push a GitHub | ✅ Hecho |
+| 4 | **Device tracker + geofencing:** Para listas de compra automáticas | Pendiente |
+| 5 | **Test delay real:** Medir tiempo end-to-end con evento en vivo | Pendiente |
 
 ---
 
