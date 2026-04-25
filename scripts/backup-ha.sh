@@ -20,7 +20,6 @@ fi
 
 # Copy config files (excluding sensitive/cache dirs)
 rsync -av --delete \
-    --exclude='.storage/' \
     --exclude='.cloud/' \
     --exclude='.cache/' \
     --exclude='*.bak*' \
