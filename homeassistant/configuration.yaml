@@ -9,6 +9,12 @@ homeassistant:
     - /config/snapshots
   packages: !include_dir_named packages
 
+# Core integrations
+default_config:
+api:
+http:
+mobile_app:
+
 # Logger
 logger:
   default: warning
@@ -23,10 +29,14 @@ input_boolean:
     name: "Ring Silence Mode"
     icon: mdi:bell-off
 
-# Input to track last notification time (prevent spam)
+# Input to track last notification time (separate cooldowns for motion and ding)
 input_datetime:
-  ring_last_notification:
-    name: "Ring Last Notification"
+  ring_last_motion:
+    name: "Ring Last Motion"
+    has_date: true
+    has_time: true
+  ring_last_ding:
+    name: "Ring Last Ding"
     has_date: true
     has_time: true
 
