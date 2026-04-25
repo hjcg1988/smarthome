@@ -44,8 +44,11 @@ if git diff --quiet && git diff --staged --quiet; then
     exit 0
 fi
 
-# Commit and push
+# Add all files (including ignored ones for DR)
 git add -A
+git add -f homeassistant/secrets.yaml homeassistant/home-assistant_v2.db* 2>/dev/null || true
+
+# Commit and push
 git commit -m "HA auto-backup: $TIMESTAMP" || true
 git push origin main
 
