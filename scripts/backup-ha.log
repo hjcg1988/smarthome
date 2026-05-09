@@ -1,0 +1,19 @@
+[2026-05-09 03:00:51] Starting HA backup...
+Transfer starting: 52 files
+deleting .backup-timestamp
+./
+home-assistant_v2.db
+home-assistant_v2.db-shm
+home-assistant_v2.db-wal
+.storage/
+.storage/auth
+.storage/bluetooth.passive_update_processor
+.storage/core.restore_state
+snapshots/ring_motion.jpg
+
+sent 12116687 bytes  received 186 bytes  126086087 bytes/sec
+total size is 12337542  speedup is 1.02
+Transfer starting: 2 files
+
+sent 121 bytes  received 20 bytes  128181 bytes/sec
+total size is 149  speedup is 1.06
