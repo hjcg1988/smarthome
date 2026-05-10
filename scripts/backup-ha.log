@@ -17,3 +17,9 @@ Transfer starting: 2 files
 
 sent 121 bytes  received 20 bytes  128181 bytes/sec
 total size is 149  speedup is 1.06
+[main 87c30f7] HA auto-backup: 2026-05-09 03:00:51
+ 7 files changed, 21 insertions(+), 2 deletions(-)
+ create mode 100644 scripts/backup-ha.log
+To https://github.com/hjcg1988/smarthome.git
+   6608ca3..87c30f7  main -> main
+[2026-05-09 03:00:51] Backup completed and pushed to GitHub.
