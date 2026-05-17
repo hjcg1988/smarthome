@@ -1,4 +1,4 @@
-[2026-05-09 03:00:51] Starting HA backup...
+[2026-05-17 03:01:42] Starting HA backup...
 Transfer starting: 52 files
 deleting .backup-timestamp
 ./
@@ -11,15 +11,9 @@ home-assistant_v2.db-wal
 .storage/core.restore_state
 snapshots/ring_motion.jpg
 
-sent 12116687 bytes  received 186 bytes  126086087 bytes/sec
-total size is 12337542  speedup is 1.02
+sent 11828519 bytes  received 186 bytes  107436012 bytes/sec
+total size is 12026808  speedup is 1.02
 Transfer starting: 2 files
 
-sent 121 bytes  received 20 bytes  128181 bytes/sec
+sent 121 bytes  received 20 bytes  1410000 bytes/sec
 total size is 149  speedup is 1.06
-[main 87c30f7] HA auto-backup: 2026-05-09 03:00:51
- 7 files changed, 21 insertions(+), 2 deletions(-)
- create mode 100644 scripts/backup-ha.log
-To https://github.com/hjcg1988/smarthome.git
-   6608ca3..87c30f7  main -> main
-[2026-05-09 03:00:51] Backup completed and pushed to GitHub.
