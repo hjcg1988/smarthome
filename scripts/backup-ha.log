@@ -23,3 +23,22 @@ To https://github.com/hjcg1988/smarthome.git
    9285df1..dda1856  main -> main
 [2026-05-17 03:01:42] Backup completed and pushed to GitHub.
 2026-06-06 03:00:56 Backup completed successfully
+[2026-06-09 03:00:59] Starting HA backup...
+Transfer starting: 55 files
+deleting .backup-timestamp
+./
+home-assistant_v2.db
+home-assistant_v2.db-shm
+home-assistant_v2.db-wal
+.storage/
+.storage/auth
+.storage/bluetooth.passive_update_processor
+.storage/core.restore_state
+snapshots/ring_motion.jpg
+
+sent 12347803 bytes  received 186 bytes  118616609 bytes/sec
+total size is 12527853  speedup is 1.01
+Transfer starting: 2 files
+
+sent 121 bytes  received 20 bytes  128181 bytes/sec
+total size is 149  speedup is 1.06
