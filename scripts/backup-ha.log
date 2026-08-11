@@ -50,3 +50,4 @@ total size is 149  speedup is 1.06
 To https://github.com/hjcg1988/smarthome.git
    1d813ba..f9374a7  main -> main
 [2026-07-22 03:00:49] Backup completed and pushed to GitHub.
+[2026-08-10 03:01:06] ERROR: Push failed - Could not resolve host: github.com (DNS failure). Local commit 008cd13 created OK but not pushed.
