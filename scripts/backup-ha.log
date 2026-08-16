@@ -51,3 +51,21 @@ To https://github.com/hjcg1988/smarthome.git
    1d813ba..f9374a7  main -> main
 [2026-07-22 03:00:49] Backup completed and pushed to GitHub.
 [2026-08-10 03:01:06] ERROR: Push failed - Could not resolve host: github.com (DNS failure). Local commit 008cd13 created OK but not pushed.
+[2026-08-16 03:01:05] Starting HA backup...
+Transfer starting: 55 files
+deleting .backup-timestamp
+./
+home-assistant_v2.db
+home-assistant_v2.db-shm
+home-assistant_v2.db-wal
+.storage/
+.storage/bluetooth.passive_update_processor
+.storage/core.restore_state
+snapshots/ring_motion.jpg
+
+sent 11241527 bytes  received 164 bytes  181025619 bytes/sec
+total size is 11431668  speedup is 1.02
+Transfer starting: 2 files
+
+sent 121 bytes  received 20 bytes  128181 bytes/sec
+total size is 149  speedup is 1.06
